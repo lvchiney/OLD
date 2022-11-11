@@ -1,0 +1,8 @@
+1) How to Upload Files from On-Prem to Azure Data Lake Gen2 by using SSIS Package - SSIS Tutorial 2021
+https://www.youtube.com/watch?v=yidOWBhiVwk
+
+2) Azure data factory || Incremental Load or Delta load from SQL to File Storage
+https://www.youtube.com/watch?v=SUGT1YhlfYs
+
+3) Windows Hyper-V Virtual Machine Tutorial
+https://www.youtube.com/watch?v=3I64TeJ4iNI&t=391s

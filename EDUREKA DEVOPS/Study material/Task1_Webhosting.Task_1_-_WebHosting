@@ -1,0 +1,21 @@
+Task 1 - WebHosting
+
+Step 1
+
+Launch Instance - centos
+ - Security Group (SSH, HTTP)
+
+ Step 2 
+
+ Connect to instance through Gitbash
+ - Install HTTPD and Git
+   sudo yum -y install httpd git
+   sudo systemctl start httpd
+   sudo systemctl enable httpd
+
+Step 3 
+- Add content to /var/www/html
+  sudo git clone https://github.com/lvchiney/ecomm.git /var/www/html
+  sudo systemctl restart httpd
+  Now the website would be up and running.
+  

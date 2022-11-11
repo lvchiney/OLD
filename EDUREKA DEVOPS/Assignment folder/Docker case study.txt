@@ -1,0 +1,17 @@
+1) git clone https://github.com/edurekacontent/dockerContent.git
+2) vi Dockerfile
+================
+#use from directive to selct base image 
+#base-image - httpd
+FROM httpd
+
+#on httpd we need code
+#use COPY directive to copy from host to image
+COPY . /usr/local/apche2/htdocs
+
+3) docker login
+provide username password
+
+4) docker push <docker account>/<image name>
+
+5) docker container run -dt --name Webapp -p 80:80 -v /home/centos/dockerContent:/app-data httpd

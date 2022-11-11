@@ -1,0 +1,268 @@
+https://get.docker.com/
+
+# This script is meant for quick & easy install via:
+#   $ curl -fsSL https://get.docker.com -o get-docker.sh
+#   $ sh get-docker.sh
+
+docker image ls
+[centos@ip-172-31-82-109 ~]$ sudo systemctl start docker
+[centos@ip-172-31-82-109 ~]$ sudo systemctl enable docker
+sudo docker image ls
+
+ sudo usermod -aG docker centos
+sudo usermod -a -G docker Jenkins
+[centos@ip-172-31-82-109 ~]$ sudo reboot
+
+sudo ls /var/lib/docker/image
+ docker container ls
+docker pull hello-world
+docker image ls
+sudo ls /var/lib/docker/image/overlay2/imagedb/content/sha256
+docker container run hello-world
+docker container ls -a
+docker container run ubuntu
+docker container run -it ubuntu
+
+root@08226d11339f:/# uname
+Linux
+root@08226d11339f:/# cat /etc/os-release
+NAME="Ubuntu"
+VERSION="20.04.3 LTS (Focal Fossa)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 20.04.3 LTS"
+VERSION_ID="20.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=focal
+UBUNTU_CODENAME=focal
+
+docker container run -dt ubuntu:22.04
+[centos@ip-172-31-82-109 ~]$ docker container ls
+CONTAINER ID   IMAGE          COMMAND   CREATED          STATUS              PORTS     NAMES
+091fd5639fec   ubuntu:22.04   "bash"    2 minutes ago    Up About a minute             distracted_tharp
+08226d11339f   ubuntu         "bash"    16 minutes ago   Up 16 minutes                 exciting_ishizaka
+docker exec 08226d11339f uname
+docker exec -it 091fd5639fec bash
+
+podman vs docker
+docker container stop 08226d11339f   
+docker container ls
+docker container ls -a
+docker container start 08226d11339f
+
+
+docker container rm 08226d11339f
+docker container rm --force 08226d11339f
+
+docker container exec 08226d11339f  cat /etc/os-release
+docker container inspect 08226d11339f
+docker container run -dt --name Test ubuntu
+
+
+df -h
+docker image ls
+ps -ef 
+ps -ef | wc -l
+docker exec nice_bose ps -ef
+sudo netstat -ntpl
+httpd
+docker container run -dt --name httpd
+docker container ls
+
+curl http://172.17.0.1
+docker exec web1 ls /usr/local/apache2/htdocs
+docker exec web1 cat /usr/local/apache2/htdocs/index.html
+
+docker container run -dt --name web2 -P httpd
+port assigning/ random port
+-p / -P
+
+-p 80:80 httpd
+ip addr
+
+docker container run -dt --name web4 -p 8090:80 httpd
+docker container run -dt --name web5 -p 8010:80 httpd
+docker network ls
+docker inspect <networkid>
+docker exec -it <id> bash
+container is non persistence in nature.
+volume - anonymous, named, host
+docker volume ls
+docker container run -dt --name no-vol ubuntu
+docker exec no-vol mkdir /app-data
+docker exec no-vol touch /app-data/backup.zip
+docker exec no-vol ls
+docker container rm --force no-vol
+docker exec no-vol ls /app-data
+
+====important==========
+docker container run -dt --name c1 -v /app-data ubuntu
+==============
+docker volume ls
+docker exec c1 ls /app-data
+docker exec c1 touch /app-data/impdata.txt
+docker exec c1 ls /app-data
+docker container inspect c1
+check Mount source---
+sudo ls <check Mount source--->
+_data (output)
+docker container rm --force no-vol
+sudo ls <check Mount source--->/_data
+docker volume ls
+
+docker container run -dt -v /app-data ubuntu
+docker container run -dt -v /app-data ubuntu
+docker container run -dt -v /app-data ubuntu
+docker container run -dt -v /app-data ubuntu
+docker container run -dt -v /app-data ubuntu
+docker container run -dt -v /app-data ubuntu
+
+docker volume ls
+
+docker container inspect c1
+docker volume ls
+docker volume rm <id>
+docker volume prune
+docker container run -dt --name c1 -v c1:/app-data ubuntu
+docker volume ls
+docker container inspect c1
+
+
+
+
+host volumes
+docker container run -dt --name host-vol -v /home/centos/scripts/:/app-data centos
+docker container inspect host-vol
+docker exec host-vol ls /app-data
+==============
+Host a website
+=============
+sudo yum -y install git
+git clone <url>
+cd ecomm
+cd ..
+ls
+docker container run -dt --name ecomm -p 8080:80 -v /home/centos/ecomm:/app-data httpd
+D C R -dt --name EC -p 8090:80
+httpd - docker location
+docker compose
+docker image ls
+D C R -dt httpd:alpine
+
+git clone food
+nginx
+D C R -dt --name food -p 8080:80 -v /home/centos/food:
+<locaton> nginx
+dockerfile
+cd ecomm
+vi Dockerfile
+=========
+#use from directive to selct base image 
+#base-image - httpd
+FROM httpd
+
+#on httpd we need code
+#use COPY directive to copy from host to image
+COPY . /usr/local/apche2/htdocs
+===========
+docker image prune -a
+docker build -t ecomm .
+ping 0.0.0.0
+docker tag ecomm akiranredy/ecomm1
+docker image ls
+docker push akirareddy/ecomm1
+
+docker login
+username password
+docker push akirareddy/ecomm1
+
+1) git clone https://github.com/Akiranred/food
+2) Dockerfile
+FROM Nginx
+COPY . /usr/.....
+
+ https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
+========================
+
+Docker Compose is a tool that was developed to help define and share multi-container applications. With Compose, we can create a YAML file to define the services and with a single command, can spin everything up or tear it all down.
+
+
+docker-compose is a separate tool 
+
+1. Run this command to download the current stable release of Docker Compose:
+
+ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+2. Apply executable permissions to the binary:
+sudo chmod +x /usr/local/bin/docker-compose
+
+3. Test the installation.
+ docker-compose --version
+
+
+
+docker-compose.yml
+
+version: "3.9"  # optional since v1.27.0
+services:
+  httpd:
+    image: httpd:alpine
+    ports:
+      - "7777:80"
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8888:80"
+  ecomm:
+    image: lvchiney/ecomm
+    ports:
+      - "8080:80"
+
+  food:
+    image: lvchiney/food
+    ports:
+      - "8090:80"
+
+  node:
+    image: lvchiney/node-app
+    ports:
+      - "9080:8080"
+
+
+
+docker-compose ps
+- to list all
+
+docker container rm -f id1 id2
+
+docker container ls
+
+docker image ls
+docker image prune -a
+y
+
+docker-compose up -d
+docker container ls
+docker-compose ps
+=> diplay properly (only used after docker-compose.yml file)
+docker-compose stop food
+docker-compose start food
+docker-compose down
+
+ps -ef | grep docker
+
+
+GitHub:https://github.com/bhavukm/cicd-pipeline-train-schedule-autodeploy
+
+
+sudo usermod -a -G docker jenkins
+
+
+
+
+
+
+

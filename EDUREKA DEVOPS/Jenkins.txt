@@ -1,0 +1,259 @@
+JENKINS INSTALLATION:
+
+sudo yum install epel-release java-11-openjdk-devel
+sudo yum -y install wget
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat/jenkins.repo --no-check-certificate
+sudo rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
+sudo yum upgrade -y
+sudo yum install jenkins
+
+You can start the Jenkins service with the command:
+
+sudo systemctl start jenkins
+You can check the status of the Jenkins service using the command:
+
+sudo systemctl status jenkins
+
+
+====================================
+https://github.com/Akiranred/ecomm
+
+Class 7 : 1:40
+
+sudo yum install java-1.8*
+
+Install apache:
+wget https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.94/bin/apache-tomcat-7.0.94.tar.gz
+
+ls
+
+tar -xvf apache-tomcat-7.0.94.tar.gz
+ls
+cd <apache folder>
+cd bin
+cd webapps/
+goto bin folder
+./startup.sh
+
+sudo netstat -ntpl
+sudo netstat -ntpl | grep 8080
+
+[centos@ip-172-31-90-179 apache-tomcat-7.0.94]$ ~/apache-tomcat-7.0.94/bin/shutdown.sh
+
+
+
+git clone -b dev https://github.com/lvchiney/JavaWebCalculator.git
+
+[centos@ip-172-31-90-179 apache-tomcat-7.0.94]$ cd JavaWebCalculator/
+[centos@ip-172-31-90-179 JavaWebCalculator]$ ls
+pom.xml  src
+
+sudo yum -y install maven
+
+[centos@ip-172-31-90-179 JavaWebCalculator]$ mvn package
+
+[centos@ip-172-31-90-179 JavaWebCalculator]$ ls
+pom.xml  src  target
+
+CONFIGURE TOMCAT
+
+[centos@ip-172-31-90-179 apache-tomcat-7.0.94]$ cd conf
+
+[centos@ip-172-31-90-179 apache-tomcat-7.0.94]$ cd conf
+
+
+You are not authorized to view this page. If you have not changed any configuration files, please examine the file conf/tomcat-users.xml in your installation. That file must contain the credentials to let you use this webapp.
+
+For example, to add the manager-gui role to a user named tomcat with a password of s3cret, add the following to the config file listed above.
+
+<role rolename="manager-gui"/>
+<user username="tomcat" password="s3cret" roles="manager-gui"/>
+
+
+[centos@ip-172-31-90-179 ~]$ pwd
+/home/centos
+[centos@ip-172-31-90-179 ~]$ ls
+apache-tomcat-7.0.94  apache-tomcat-7.0.94.tar.gz
+[centos@ip-172-31-90-179 ~]$ ~/apache-tomcat-7.0.94/bin/shutdown.sh
+
+[centos@ip-172-31-90-179 ~]$ ~/apache-tomcat-7.0.94/bin/startup.sh
+
+[centos@ip-172-31-90-179 target]$ ls
+classes  maven-archiver  surefire  WebAppCal-0.0.1  WebAppCal-0.0.1.war
+
+[centos@ip-172-31-90-179 target]$ cp WebAppCal-0.0.1.war ~/apache-tomcat-7.0.94/webapps/
+
+http://54.165.150.234:8080/WebAppCal-0.0.1/
+
+
+php build tool - ngbuild/npm
+
+
+[centos@ip-172-31-90-179 ~]$ cd /tmp/
+[centos@ip-172-31-90-179 tmp]$ git clone https://github.com/lvchiney/DevOpsClassCodes.git
+Cloning into 'DevOpsClassCodes'...
+remote: Enumerating objects: 50, done.
+remote: Total 50 (delta 0), reused 0 (delta 0), pack-reused 50
+Unpacking objects: 100% (50/50), done.
+[centos@ip-172-31-90-179 tmp]$ ls
+DevOpsClassCodes  hsperfdata_centos  hsperfdata_root  systemd-private-b93abdf36200432baba79ba1e44e44ec-chronyd.service-JwVnyM
+[centos@ip-172-31-90-179 tmp]$
+
+
+[centos@ip-172-31-90-179 DevOpsClassCodes]$ ls
+addressbook_screenshot.png  build.properties  build.xml  pom.xml  README.md  src
+
+****JENKINS****
+1) job1 - compile
+2) code review
+3) unit test
+4) metric check
+5) package
+
+1) New job
+name: compile
+freestyle project
+
+Description: compile job
+Source code management select git and provide the link
+
+Class 8: 50:00 after check the complete [process.
+
+maven plugin also known as Goals
+
+Invoke top-level Maven targets
+Goal: compile
+
+Build now
+
+console:   /var/lib/jenkins/workspace/compile
+
+we can see the target folder in the above linkj
+
+2) New job
+name: code review
+freestyle project
+
+Source code management select git and provide the link
+
+mvn pmd plugin
+program mistake defender
+
+Invoke top-level Maven targets
+Goal: pmd:pmd
+Build now
+
+workspace/target/pmd.xml
+
+
+Dashboard-> Manage jenkins-> manage plugin ->  Install Violations plugin
+
+
+configure
+
+Post build action
+Report violation
+
+in the row of pmd
+mention the path : taget/pmd.xml
+
+save 
+build now
+
+in parallel with console log we can see "Violations"
+
+3) Unit test
+git url
+
+Invoke top-level Maven targets
+Goal: test
+build now
+
+surefire report in the workspace
+
+configure
+Add post build action -> Publish JUnit test result report
+
+Test report XMLs: target/surefire-reports/*.xml
+
+save 
+build now
+
+in parallel with console log we can see "Test Result"
+
+4) this is a metric check
+git url
+
+Invoke top-level Maven targets
+Goal: cobertura:cobertura -Dcobertura.report.format=xml
+
+build now
+
+workspace/target/site/cobertura
+
+cobertura plugin need to install 
+
+post build action -> Publish Cobertura Coverage Report
+
+**/target/site/cobertura/coverage.xml
+
+build now
+
+in parallel with console log we can see "Coverage Report"
+
+
+
+
+5) packge
+git url
+
+Invoke top-level Maven targets
+Goal: package
+
+build now
+
+workspace-> target-> adreesbook.war
+============
+PIPELINE
+===========
+Build Triggers -> Build after other projects are built
+
+Poll SCM - It will identify changes in github.
+
+so for compile we use "Poll SCM"
+
+Post Build action for compile job will be code review.
+
+select: Build other projects
+
+Projects to build: CodeReview
+
+For codereview job
+================
+Build triggers:
+Build after other projects are built
+Projects to watch : compile
+
+this pc -> settings -> app -> optionl features -> view features -> write: open ssh
+
+PIPELINE:
+========
+compile job -> configure -> build triggers
+
+crontab.guru/
+
+Install build pipeline plugin
+
++
+Build pipeline view
+Viewname: 1st pipeline
+
+Select initial job : compile
+
+
+Post build action: Editable email notifiction
+
+Project Recipient List: pchiney@rediffmail.com
+
+advance setting
+Add trigger 

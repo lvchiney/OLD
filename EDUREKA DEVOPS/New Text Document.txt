@@ -1,0 +1,11 @@
+1) How to send report corbetura jenkins to developer?
+
+2) We have not seen how to deploy code to a server/docker after building code in Jenkins.
+
+
+Good evening Kiran
+
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc
+
+
+*)) We have 1 master and 2 node in a kubernetes cluster. Now I am creating 4 deployment replicas. All the 4 replicas will be distributed in 2 nodes? 

@@ -1,0 +1,90 @@
+Dockerfile for Angular 
+======================
+FROM node:latest AS build
+COPY . /app
+WORKDIR /app
+RUN npm install
+RUN npm run build
+
+FROM nginx:latest
+COPY --from=build /app/dist/sample-angular-app /usr/share/nginx/html
+EXPOSE 80
+
+Dockerfile for Node.js 
+======================
+FROM node:16
+WORKDIR /usr/src/app
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 8080
+CMD [ "node", "server.js" ]
+
+Dockerfile for Asp.net 
+======================
+# syntax=docker/dockerfile:1
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
+WORKDIR /app
+    
+# Copy csproj and restore as distinct layers
+COPY *.csproj ./
+RUN dotnet restore
+    
+# Copy everything else and build
+COPY ../engine/examples ./
+RUN dotnet publish -c Release -o out
+    
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
+WORKDIR /app
+COPY --from=build-env /app/out .
+ENTRYPOINT ["dotnet", "aspnetapp.dll"]
+
+https://kubernetes.io/docs/concepts/services-networking/ingress/
+
+Ingress backed by a single Service 
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-ingress
+spec:
+  defaultBackend:
+    service:
+      name: test
+      port:
+        number: 80
+
+
+Simple fanout 
+A fanout configuration routes traffic from a single IP address to more than one Service, based on the HTTP URI being requested. An Ingress allows you to keep the number of load balancers down to a minimum. For example, a setup like:
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: simple-fanout-example
+spec:
+  rules:
+  - host: foo.bar.com
+    http:
+      paths:
+      - path: /foo
+        pathType: Prefix
+        backend:
+          service:
+            name: service1
+            port:
+              number: 4200
+      - path: /bar
+        pathType: Prefix
+        backend:
+          service:
+            name: service2
+            port:
+              number: 8080
+
+
+

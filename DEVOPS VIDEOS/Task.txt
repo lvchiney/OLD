@@ -1,0 +1,8 @@
+1) Azure account opening
+2) Node jS deployment
+3) ARM template deployment
+4) Terraform one deployment
+5) Jenkins/ansible/docker/Kubernetes- edureca
+6) selenium/Cobertura/fod
+
+jbA8Q~bvMivxXx8YrSCT0t0nDcxyv9iGHOeL0bep

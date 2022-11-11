@@ -1,0 +1,129 @@
+1) DevOps CI/CD Jenkins Pipeline, Ansible & Docker
+
+https://www.youtube.com/watch?v=13FpCxCClLY
+
+AMAZON LINUX 2 IMAGE
+
+git --version
+cd /var/lib/jenkins/tools/
+
+sudo amazon-linux-extras install ansible2
+
+ansible --version
+
+exuctable location:
+
+git rev-parse --short HEAD
+
+
+install ansible plugin
+
+manage-> configuration tool -> Ansible 
+Name: ansible
+Path to ... : /usr/bin/
+
+Declarative pipeline:
+
+pipeline{
+  agent any 
+
+  
+  stages{
+    stage('SCM'){
+      steps{
+        git...........
+      }
+    }
+    stage('Maven Build'){
+      steps{
+        sh "mvn clean package"
+      }
+    }
+    stage('Docker Build'){
+      steps{
+        sh "docker build . -t lvchiney/ddd:${DOCKER_TAG}"
+      }
+    }
+
+    stage('Docker push'){
+      steps{
+      sh "docker login -u lvchiney -p password"
+        sh "docker push lvchiney/ddd:${DOCKER_TAG}"
+      }
+    }
+
+  }
+}
+
+build commands only for jenkins
+
+
+
+sudo usermod -a -G docker jenkins
+sudo service jenkins restart
+sudo chkconfig docker on
+sudo service docker start
+
+
+===============================
+
+2) Building Docker Images using Jenkins step by step
+
+https://www.youtube.com/watch?v=mszE-OCI2V4
+
+3) sample devops end to end project v1- devops project | ci/cd declarative pipeline using devops tools
+
+https://www.youtube.com/watch?v=nP6uei3TBsc
+
+4) AWS Tutorial | CI/CD PHP App with GitHub & Code Pipeline | PHP | Deploy PHP on Elastic Beanstalk
+
+https://www.youtube.com/watch?v=TxL_FudOjTs
+
+5) CICD Pipeline To Deploy To Kubernetes Cluster Using Jenkins | Jenkins Kubernetes Integration
+
+https://www.youtube.com/watch?v=XE_mAhxZpwU
+
+6) Create Kubernetes Cluster Using Kubeadm | How To Setup Kubernetes Cluster On Linux
+
+https://www.youtube.com/watch?v=cAZ5nkLfL6M
+
+
+
+
+
+
+Installing Node.js and npm on CentOS 7 #
+NodeSource is a company dedicated to providing enterprise-grade Node support and they maintain a consistently-updated Node.js repository for Linux distributions.
+
+
+To install Node.js and npm from the NodeSource repositories on your CentOS 7 system, follow these steps:
+
+1. Add NodeSource yum repository
+The current LTS version of Node.js is version 10.x. If you want to install version 8 just change setup_10.x with setup_8.x in the command below.
+
+Run the following curl command to add the NodeSource yum repository to your system:
+
+curl -sL https://rpm.nodesource.com/setup_12.x | sudo bash -
+Copy
+2. Install Node.js and npm
+Once the NodeSource repository is enabled, install Node.js and npm by typing:
+
+sudo yum install nodejs
+Copy
+When prompted to import the repository GPG key, type y, and press Enter.
+
+3. Verify the Node.js and npm Installation
+To check that the installation was successful, run the following commands which will print the Node.js and npm versions.
+
+
+Print Node.js version:
+
+node --version
+v12.22.9
+Copy
+Print npm version:
+
+
+Kubernetes Continuous Plugin 1.0 version
+
+npm --version

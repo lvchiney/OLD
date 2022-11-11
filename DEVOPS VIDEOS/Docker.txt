@@ -1,0 +1,8 @@
+docker search ubuntu
+docker image
+docker ps    ---all containers
+docker ps -a  -- all containers including stop one
+docker build -t lvchiney/myangular:1.0.0 .
+docker image
+docker run --rm -ti lvchiney/myangular:1.0.0
+docker run --rm -ti -p 4300:80 lvchiney/myangular:1.0.0

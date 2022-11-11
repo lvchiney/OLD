@@ -1,0 +1,44 @@
+What is the functionality of git clean command? 
+The git clean command removes the untracked files from the working directory.
+
+If you recover a deleted branch, what work is restored?
+The files that were stashed and saved in the stashed index can be recovered. The files that were untracked will be lost. Hence, it's always a good idea to stage and commit your work or stash them.
+
+What does the git reset --mixed and git merge --abort commands do?
+git reset --mixed is used to undo changes made in the working directory and staging area.
+git merge --abort helps stop the merge process and return back to the state before the merging began
+
+The Git fetch command only downloads new data from a remote repository
+Git pull updates the current HEAD branch with the latest changes from the remote server.
+
+
+What is the process to revert a commit that has already been pushed and made public?
+There are two processes through which you can revert a commit:
+1. Remove or fix the bad file in a new commit and push it to the remote repository. Then commit it to the remote repository using:
+git commit –m “commit message”
+2. Create a new commit to undo all the changes that were made in the bad commit. Use the following command:
+git revert <commit id>
+
+What has to be run to squash the last N commits into a single commit?
+In Git, squashing commits means combining two or more commits into one.
+Use the below command to write a new commit message from the beginning.
+git reset -soft HEAD~N &&git commit
+ Git rebase Incorporates all the new commits in the master branch.
+
+How do you recover a deleted branch that was not merged?
+To recover a deleted branch, first, you can use the git reflog command. It will list the local recorded logs for all the references. Then, you can identify the history stamp and recover it using the git checkout command.
+
+Git reset is a command that is used to undo the local changes that have been made to a Git repository. Git reset operates on the following: commit history, the staging index, and the working directory.
+The revert command in Git is used to create a new commit that undoes the changes made in the previous commit. When you use this command, a new history is added to the project; the existing history is not modified.
+
+What is “git cherry-pick”?
+The command git cherry-pick enables you to pick up commits from a branch within a repository and apply it to another branch. This command is useful to undo changes when any commit is accidentally made to the wrong branch. Then, you can switch to the correct branch and use this command to cherry-pick the commit.
+
+
+VIDEOS============================
+1) What is git cherry pick and when it should be used by developer ? || Git Cherry pick
+https://youtu.be/B55yjw4C8rI
+2) Git Reflog Command. Get all log details of the reference using git reflog show command - GIT
+https://www.youtube.com/watch?v=I4f4pddD16g
+3) DevOps | Git Revert, Reset, Checkout | git tutorial for beginners | git tutorial | Git Undo Changes
+https://www.youtube.com/watch?v=VUuGa1QFmcA

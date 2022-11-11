@@ -1,0 +1,72 @@
+Task 2 - Virtual webhosting
+If we want to run multiple applications on the same server we use virtual hosting.
+ 
+Step 1
+- Launch Instance
+  security (SSH, HTTP, Port 8080)
+
+Step 2 
+- Install HTTPD and Git
+  sudo yum -y install httpd git
+  sudo systemctl start httpd 
+  sudo systemctl enable httpd
+  sudo systemctl status httpd (will be active)
+
+Step 3
+- Clone application data to local machine 
+  Git clone (Food Url) https://github.com/lvchiney/food.git
+  Git Clone (ecomm Url) https://github.com/lvchiney/ecomm.git
+
+Step 4 
+- Move the cloned data to /var/www/html
+  sudo mv food ecomm /var/www/html
+
+Step 5
+- Enable security permissions
+  sudo getenforce (Disabled)
+  sudo setenforce (1 | 0 )
+  sudo setenforce 0 (to change it to permissive)
+  //If we get an error stating unable to make changes
+  //Hardwrite the SElinux 
+  sudo nano /etc/sysconfig/selinux
+  //change permission Disabled to Permissive (ctrl + o - save, ctrl + x - exit)
+  sudo reboot
+  //Mow if we check ip/food, ip/ecomm we would be able to see the websites.
+
+Step 6
+- Lets edit the Apache httpd configuration file.
+  sudo nano /etc/httpd/conf/httpd.conf
+  // Add (Listen 8080) to the list under (listen 80)
+  // Add the below text at the bottom of the page
+  // <VirtualHost *:80>
+      ServerName www.example.com (Mention server name if we have a domain registerd, else we can remove this tab)
+      DocumentRoot "/var/www/html/food"
+    </VirtualHost>
+
+    <VirtualHost *:8080>
+    ServerName other.example.com (Mention server name if we have a domain registerd, else we can remove this tab)
+    DocumentRoot "/var/www/html/ecomm"
+    </VirtualHost>
+  //(save and exit)
+
+Step 7
+- sudo systemctl restart httpd
+  httpd -t
+  //Now if we browse the public ip:80 will give us food site and public ip:8080 will give us ecomm site
+  //This way we can host multiple websites through single server
+
+  sudo chmod -R 775 /var/www/html/food
+    sudo chmod -R 775 /var/www/html/ecomm
+
+
+sudo nano /etc/httpd/conf/httpd.conf
+    Listen 80
+    Listen 8080 
+
+<VirtualHost *:80>
+  DocumentRoot "/var/www/html/food"
+</VirtualHost>
+
+<VirtualHost *:8080>
+   DocumentRoot "/var/www/html/ecomm"
+</VirtualHost>

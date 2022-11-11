@@ -1,0 +1,201 @@
+aws
+kubectl
+
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+sudo yum -y install unzip
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+aws --version
+
+aws s3 mb s3://k8-chiney-100
+
+IAM--> Roles  --> Create Role --> Aws services --> EC2 --> Next Permission --> Provide name --> Create
+
+EC2 instance --> Security tab --> Iam Role
+
+Action--> Security --> Modify IAM role
+
+aws s3 mb s3://k8-chiney-100
+
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-using-native-package-management
+(Select Red hat based distributions)
+
+
+cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+
+sudo yum install -y kubectl
+
+https://kubernetes.io/docs/setup/production-environment/tools/kops/
+
+Download the latest release with the command:
+curl -LO https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+
+Make the kops binary executable:
+chmod +x kops-linux-amd64
+
+Move the kops binary in to your PATH.
+sudo mv kops-linux-amd64 /usr/local/bin/kops
+
+[centos@ip-172-31-26-33 ~]$ ssh-keygen
+Generating public/private rsa key pair.
+
+export KOPS_STATE_STORE=s3://k8-chiney-100
+
+cluster name needs to end with k8s.local and before that you can put almost anything.
+
+kops create cluster --name=main.k8s.local --state=s3://k8-chiney-100 --zones=us-west-2a,us-west-2b --node-count=2 --yes
+
+
+==================FROM INTERNET========================
+export NAME=cluster.k8s.local
+
+aws s3api create-bucket --bucket ${NAME}-state
+
+export KOPS_STATE_STORE=s3://cluster.k8s.local-state
+
+kops create cluster \
+ --name=${NAME} \
+ --zones=us-west-2a \
+ --master-size="t2.micro" \
+ --node-size="t2.micro" \
+ --node-count="3" \
+ --ssh-public-key="~/.ssh/id_rsa.pub"
+=========================================================
+
+Cluster is starting.  It should be ready in a few minutes.
+
+Suggestions:
+ * validate cluster: kops validate cluster --wait 10m
+ * list nodes: kubectl get nodes --show-labels
+ * ssh to the master: ssh -i ~/.ssh/id_rsa ubuntu@api.main.k8s.local
+ * the ubuntu user is specific to Ubuntu. If not using Ubuntu please use the appropriate user based on your OS.
+ * read about installing addons at: https://kops.sigs.k8s.io/operations/addons.
+
+
+EC2 instances/ Security Group/Volumes/ Key pairs/ Load balancer
+
+[centos@ip-172-31-26-33 ~]$ kops validate cluster
+Using cluster from kubectl context: main.k8s.local
+
+Validating cluster main.k8s.local
+
+INSTANCE GROUPS
+NAME                    ROLE    MACHINETYPE     MIN     MAX     SUBNETS
+master-us-west-2a       Master  t3.medium       1       1       us-west-2a
+nodes-us-west-2a        Node    t3.medium       1       1       us-west-2a
+nodes-us-west-2b        Node    t3.medium       1       1       us-west-2b
+
+NODE STATUS
+NAME                                            ROLE    READY
+ip-172-20-45-50.us-west-2.compute.internal      node    True
+ip-172-20-52-161.us-west-2.compute.internal     master  True
+ip-172-20-70-81.us-west-2.compute.internal      node    True
+
+Your cluster main.k8s.local is ready
+
+
+[centos@ip-172-31-26-33 ~]$ kops get cluster
+NAME            CLOUD   ZONES
+main.k8s.local  aws     us-west-2a,us-west-2b
+
+[centos@ip-172-31-26-33 ~]$ kubectl run web --image=httpd
+pod/web created
+[centos@ip-172-31-26-33 ~]$ kubectl get pods
+NAME   READY   STATUS    RESTARTS   AGE
+web    1/1     Running   0          14s
+
+kubectl describe pod web
+kubectl delete pod web
+kubectl get pods
+
+deployment service
+===============
+kubectl create deployment web --image=httpd
+kubectl get pods
+kubectl get all  (pod, service,deploment,replicaset)
+kubectl delete <pod1>
+kubectl get all (pods is automatically creted)
+kubectl delete <deployment name>
+kubectl get all (nothing will be there)
+
+
+kubectl create deployment web --image=httpd --replicas=2
+kubectl get all (will see 2 pods are creataed)
+kubectl delete <pod1>
+kubectl get all (pods is automatically creted)
+
+To see complete details of pods:
+kubectl get pods -o wide
+
+
+==================
+google - kubernetes service
++++++++++++
+kubectl expose <deployment name> --port 80 --name httpd-service --type LoadBalancer
+kubectl get all (a new service will be created Type is loadbalancer)
+open loadbalancer use the url 
+
+Service -> Deployment -> Replica -> Pods -> Containers -> app-data
+
+
+How to run kubernetes using imperative commands
+
+
+
+declarative manifest like playbook in ansible
+
+kops export kubecfg --admin
+export KOPS_STATE_STORE=s3://k8-100200
+kops export kubecfg --admin
+
+mkdir k8-manifest
+cd k8-manifest
+vi pod.yml
+copy the code from https://github.com/lvchiney/k8/pod.yml
+
+kubectl apply -f pod.yml
+kubectl get all
+
+kubectl logs pod/web
+=> to get full details
+
+
+vi deployment.yml
+copy the code from https://github.com/lvchiney/k8/deployment.yml
+
+kubectl apply -f deployment.yml
+
+kubectl get all
+
+vi service.yml
+kubectl apply -f service.yml
+
+image: akiranreddy/ecomm:latest => It will automatically check the latest changes and run ******
+
+
+=====END==============
+
+
+
+Combining Kubernetes Deployment vs. Service
+Deployments and Services are often used in tandem: Deployments working to define the desired state of the application and Services working to make sure communication between almost any kind of resource and the rest of the cluster is stable and adaptable. It is highly recommended that most workloads use both, but in some cases that may not make sense depending on application behavior. Here are some overviews of what would happen if you chose not to run a deployment or a service for your application.
+
+
+
+
+
+
+
+

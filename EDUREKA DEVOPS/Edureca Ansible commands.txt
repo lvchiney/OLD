@@ -1,0 +1,770 @@
+    1  ls
+    2  df -h
+    3  ansible
+    4  ls /etc/
+    5  sudo yum -y install epel-release
+    6  sudo yum -y update
+    7  sudo yum -y install ansible
+    8  ansible --version
+    9  ls /etc/ansible
+   10  vi /elc/ansible/hosts
+   11  vi /etc/ansible/hosts
+   12  sudo vi /etc/ansible/hosts
+   13  ansible --list-hosts all
+   14  history
+
+ansible [pattern] -m [module] -a [module option]
+
+15  sudo vi /etc/ansible/hosts
+   16  ansible --list-hosts all
+   17  ansible --list-hosts Web
+   18  sudo vi /etc/ansible/hosts
+   19  ansible --list-hosts all
+   20  ansible -m ping all
+   21  history
+
+scp -i .\AWSCHINEY.pem .\AWSCHINEY.pem centos@3.83.139.169:~ 
+
+[centos@ip-172-31-81-141 ~]$ ls -l AWSCHINEY.pem
+-rw-rw-r--. 1 centos centos 387 Jan 25 06:52 AWSCHINEY.pem
+[centos@ip-172-31-81-141 ~]$ chmod 400 AWSCHINEY.pem
+[centos@ip-172-31-81-141 ~]$ ls -l AWSCHINEY.pem
+-r--------. 1 centos centos 387 Jan 25 06:52 AWSCHINEY.pem
+
+
+
+[centos@ip-172-31-92-9 playbook]$ cat /etc/ansible/hosts
+[Web]
+W1 ansible_host=172.31.83.236 ansible_user=centos ansible_ssh_private_key_file=/home/centos/AWSCHINEY.pem
+[Db]
+D1 ansible_host=172.31.87.104 ansible_user=centos ansible_ssh_private_key_file=/home/centos/AWSCHINEY.pem
+D2 ansible_host=172.31.93.20 ansible_user=centos ansible_ssh_private_key_file=/home/centos/AWSCHINEY.pem
+
+ansible all -m file -a "path=/home/centos/ChineyFolder state=directory"
+ansible all -m command -a "ls"
+ansible W1 -m copy -a "dest=/home/centos/hello.txt content=Hi.are.you.there"
+ansible W1 -m command -a "cat hello.txt"
+ansible W1 -m file -a "path=/home/centos/hello.txt state=absent"
+ansible W1 -m get_url -a "dest=/home/centos url=https://image.shutterstock.com/image-vector/vector-download-file-icon-document-260nw-1524113318.jpg"
+ansible all -m command -a "ls"
+ansible all -m package -a "name=wget state=present" -b
+ansible W1 -m package -a "name=httpd state=present" -b
+add security group
+ansible W1 -m service -a "name=httpd state=started enabled=yes" -b
+ansible W1 -m package -a "name=git state=present" -b
+ansible W1 -m git -a "repo=https://github.com/Akiranred/ecomm.git dest=/var/www/html" -b
+
+1)ansible-playbook 01-single-play-single-task.yml
+
+- name: Update web servers
+  hosts: W1
+
+  tasks:
+  - name: Create a new dir
+    file:
+      path: /home/centos/Play-dir
+      state: directory
+
+2)  ansible-playbook 02-file.yml
+
+[centos@ip-172-31-92-9 playbook]$ cat 02-file.yml
+- name: Update web servers
+  hosts: all
+
+  tasks:
+  - name: Create a new dir Web and Db1
+    file:
+      path: /home/centos/Play-dir1
+      state: directory
+
+  - name: Create a new dir
+    file:
+      path: /home/centos/Play-dir2
+      state: directory
+
+3) 03-multi-play-multi-task.yml
+- name: Update web servers
+  hosts: W1
+
+  tasks:
+  - name: Create a new dir Edureka
+    file:
+      path: /home/centos/Edureka
+      state: directory
+
+- name: Update DB servers
+  hosts: Db
+
+  tasks:
+  - name: Create a new file
+    copy:
+      dest: /home/centos/Hello.txt
+      content: Hello_my_amazing_students
+
+- name: Update App servers
+  hosts: App
+
+  tasks:
+  - name: Download url
+    get_url:
+      dest: /home/centos
+      url: https://filesamples.com/samples/document/txt/sample3.txt
+=======================
+ansible Db -m command -a "cat sample.txt"
+
+ansible all -m ping
+
+======================
+4) 04-httpd.yml
+
+- name: Update All servers
+  hosts: all
+  become: yes  <== Root access
+
+  tasks:
+  - name: Install httpd
+    package:
+      name: httpd
+      state: present
+
+  - name: Start httpd
+    service:
+      name: httpd
+      state: started 
+
+  - name: Enable httpd
+    service:
+      name: httpd
+      enabled: yes
+
+ansible-playbook 04-httpd.yml
+
+https://opensource.com/article/20/10/ansible-modules-linux#:~:text=10%20Ansible%20modules%20for%20Linux%20system%20automation%20%7C%20Opensource.com,-10%20Ansible%20modules
+
+5) cp 04-httpd.yml 05-ecomm-httpd.yml
+
+- name: Update All servers
+  hosts: all
+  become: yes  <== Root access
+
+  tasks:
+  - name: Install git
+    package:
+      name: git
+      state: present
+
+  - name: Deploy ecomm
+    git:
+      dest: /var/www/html
+      repo: https://github.com/lvchiney/ecomm.git 
+
+6) grep Listen /etc/httpd/conf/httpd.conf
+
+Login to master node and provide the below command
+
+Copy httpd config file from any worker node to master node instances
+
+scp -i O.pem centos@172.31.95.178:/etc/httpd/conf/httpd.conf ~/playbook/
+
+06-config.yml
+
+- name: Update All servers
+  hosts: all
+  become: yes  <== Root access
+
+  tasks:
+  - name: Ensure config file is updated
+    copy:
+      src: httpd.conf
+      dest: /etc/httpd/conf/httpd.conf
+
+
+ansible all -m command -a "grep Listen /etc/httpd/conf/httpd.conf"
+
+
+ansible-playbook 06-config.yml
+
+
+7) 07-selinux.yml
+
+- name: Update All servers
+  hosts: all
+  become: yes  <== Root access
+
+  tasks:
+  - name: Modify SELinux
+    selinux:
+      policy: targeted
+      state: permissive
+
+  - name: Restart httpd
+    service:
+      name: httpd
+      state: restarted
+
+WEBSITE IS UP AND RUNNING IN PORT 8090
+
+====================
+UBUNTU
++++++++++++++
+sudo apt -y install apache2 <=equivalent to httpd
+
+sudo systemctl start apache2
+sudo systemctl enable apache2
+=======================
+
+host file vs inventory file
+
+
+8) 08-apche2.yml 
+- name: Update all servers
+  hosts: all
+  become: yes  
+
+  tasks:
+  - name: Install httpd
+    package:
+      name: httpd
+      state: present
+
+  - name: start httpd
+    service:
+      name: httpd
+      state: started
+
+  - name: Enable httpd
+    service:
+      name: httpd
+      enabled: yes
+
+- name: Update ubuntu servers
+  hosts: all
+  become: yes  
+
+  tasks:
+  - name: update apt
+    apt:
+      update_cache: yes
+
+  - name: install apche
+    service:
+      name: apache2
+      state: started
+
+  - name: start apche2
+    service:
+      name: apache2
+      state: started 
+
+  - name: enable apche2
+    service:
+      name: apache2
+      enabled: yes
+
+sudo cp /etc/ansible/hosts ub.ini
+
+change the ownership
+
+sudo chown centos:centos ub.ini
+
+add details like host files
+
+ansible -i ub.ini all -m ping
+
+ansible-playbook 08-apache2.yml -i  ub.ini
+(order does not matter)
+
+9) ansible -i ub.ini all -m setup
+ansible -i ub.ini all -m setup | grep ansible_distribution 
+
+cat 08-apche2.yml >> 09-multi.yml
+
+
+- name: Update all servers
+  hosts: all
+  become: yes  
+
+  tasks:
+  - name: Install httpd
+    package:
+      name: httpd
+      state: present
+    when: ansible_distribution == "CentoOS"
+
+  - name: start httpd
+    service:
+      name: httpd
+      state: started
+    when: ansible_distribution == "CentOS"
+
+  - name: Enable httpd
+    service:
+      name: httpd
+      enabled: yes
+    when: ansible_distribution == "CentOS"
+
+- name: Update ubuntu servers
+  hosts: all
+  become: yes  
+
+  tasks:
+  - name: update apt
+    apt:
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install apche
+    service:
+      name: apache2
+      state: started
+    when: ansible_distribution == "Ubuntu"
+
+  - name: start apche2
+    service:
+      name: apache2
+      state: started 
+    when: ansible_distribution == "Ubuntu"
+
+  - name: enable apche2
+    service:
+      name: apache2
+      enabled: yes
+    when: ansible_distribution == "Ubuntu"
+
+
+ansible-playbook 09-multi.yml -i ub.ini
+
+10) cp 08-apche2.yml 10-multipage.yml
+
+- name: Update all servers
+  hosts: all
+  become: yes  
+
+  tasks:
+  - name: update page on centos
+    copy:
+      src: centos.html
+      dest: /var/www/html 
+    when: ansible_distribution == "CentoOS"
+
+  - name: update page on ubuntu
+    copy:
+      src: ubuntu.html
+      dest: /var/www/html 
+    when: ansible_distribution == "Ubuntu"
+
+ansible-playbook 10-multipage.yml -i ub.ini
+
+check the url IP:8090/centos.html
+check the url IP:8090/ubuntu.html
+
+11) cp 10-multipage.yml static.html
+cp centos.html 11-static.yml
+
+- name: Update all servers
+  hosts: all
+  become: yes  
+
+  tasks:
+  - name: update static page
+    copy:
+      src: static.html
+      dest: /var/www/html 
+
+
+12)
+Template - Jinja2 template
+
+static.html
+
+<title>{{ansible_distribution}}</title>
+<h1>Welcome to OSNAME {{ansible_distribution}}</h1>
+<h1>The hostname of server {{ansible_hostname}}</h1>
+
+cp static.html dynamic.j2
+
+cp 11-static.yml 12-dynamic.yml
+
+- name: Update all servers
+  hosts: all
+  become: yes  
+
+  tasks:
+  - name: update static page
+    template:
+      src: dynamic.j2
+      dest: /var/www/html/dynamic.html
+
+ 
+ansible-playbook 12-dynamic.yml -i ub.ini
+
+check the url IP:8090/dynamic.html
+
+
+13) dynamic.j2
+
+<title>{{ansible_distribution}}</title>
+<h1>Welcome to OSNAME {{ansible_distribution}}</h1>
+<h1>The hostname of server {{ansible_hostname}}</h1>
+<h1>Managed by {{user_name}}</h1>
+
+
+- name: Update all servers
+  hosts: all
+  become: yes  
+  vars:
+      user_name: Chiney
+
+  tasks:
+  - name: update static page
+    template:
+      src: dynamic.j2
+      dest: /var/www/html/dynamic.html
+
+ansible-playbook 13-vars.yml -i ub.ini
+
+check the url IP:8090/dynamic.html
+
+ansible-playbook 13-vars.yml -i ub.ini -e user_name= sysadmin
+
+check the url IP:8090/dynamic.html
+
+14) cp 07-selinux.yml 14-dynamic-config.yml
+
+
+- name: Update All servers
+  hosts: all
+  become: yes  <== Root access
+
+  tasks:
+  - name: Modify SELinux
+    selinux:
+      policy: targeted
+      state: permissive
+
+  - name: Update config
+    copy:
+      src: httpd.j2
+      dest: /etc/httpd/conf/httpd.conf
+
+  - name: Restart httpd
+    service:
+      name: httpd
+      state: restarted
+
+
+cp httpd.conf httpd.j2
+
+Listen {{http_port}} in place of Listen 80
+
+ansible -i ub.ini Web -m command -a "grep Listen /etc/httpd/conf/httpd.conf"
+
+
+- name: Update All servers
+  hosts: all
+  become: yes  
+  vars:
+      http_port: 8090
+
+  tasks:
+  - name: Modify SELinux
+    selinux:
+      policy: targeted
+      state: permissive
+
+  - name: Update config
+    template:
+      src: httpd.j2
+      dest: /etc/httpd/conf/httpd.conf
+
+  - name: Restart httpd
+    service:
+      name: httpd
+      state: restart
+
+ansible-playbook 14-dynamic-config.yml -i ub.ini -e http_port= 8080
+
+15) cp 14-dynamic-config.yml 15-no-handler.yml
+
+- name: Update All servers
+  hosts: all
+  become: yes  
+  vars:
+      http_port: 8090
+
+  tasks:
+  - name: Modify SELinux
+    selinux:
+      policy: targeted
+      state: permissive
+
+  - name: Update config
+    template:
+      src: httpd.j2
+      dest: /etc/httpd/conf/httpd.conf
+
+  - name: Restart httpd
+    service:
+      name: httpd
+      state: restart
+
+  - name: update PHP page
+    copy:
+      src: date.php
+      dest: /var/www/html/date.php
+
+  - name: Install PHP
+    package:
+      name: php
+      state: present
+
+  - name: Restart httpd
+    service:
+      name: httpd
+      state: restart
+
+
+ansible-playbook 15-no-handler.yml -i ub.ini -e http_port= 8080
+
+check the url IP:8080/date.php
+
+16) Ansible handler
+cp  15-no-handler.yml
+
+- name: Update All servers
+  hosts: all
+  become: yes  
+  vars:
+      http_port: 8090
+
+  handlers:
+    - name: Restart apache
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+
+  tasks:
+  - name: Modify SELinux
+    selinux:
+      policy: targeted
+      state: permissive
+
+
+  - name: Update config
+    template:
+      src: httpd.j2
+      dest: /etc/httpd/conf/httpd.conf
+    notify:
+    - Restart apache
+
+  - name: update PHP page
+    copy:
+      src: date.php
+      dest: /var/www/html/date.php
+
+  - name: Install PHP
+    package:
+      name: php
+      state: present
+
+
+ansible-playbook 15-no-handler.yml -i ub.ini -e http_port= 8080
+
+ansible-playbook 16-handler.yml -i ub.ini -e http_port= 8080
+
+17) Roles:
+Roles let you automatically load related vars, files, tasks, handlers, and other Ansible artifacts based on a known file structure. After you group your content in roles, you can easily reuse them and share them with other users.
+
+New EC2 instance for Roles
+
+Add details in ansible master node
+
+
+ansible --list-hosts all
+ansible all -m ping
+
+ansible-galaxy init role1
+ls
+cd role1/
+
+tasks is most important directory contains main.yml
+
+cd tasks/
+vi install.yml
+
+---
+- name: install httpd
+  package:
+    name: httpd
+    state: present
+
+-name: start httpd
+ service:
+   name: httpd
+   state: started
+
+-name: enables httpd
+ service:
+   name: httpd
+   enables: yes
+...
+
+
+cp install.yml config.yml
+
+config.yml
+
+---
+- name: SELinux Enable
+  selinux:
+    policy: targeted
+    state: permissive
+
+-name: update config 
+ template:
+   src: httpd.j2
+   dest: /etc/httpd/conf/httpd.conf
+ notify:
+ - Restart httpd
+
+-name: update sample page
+ copy:
+   src: info.html
+   dest: /var/www/html/info.html
+...
+
+
+cd 
+
+cd roles/
+cd vars/
+
+edit main.yml
+
+http_port: 8090
+
+cd
+cd playbooks/
+
+cp httpd.j2 ~/roles/temlates/
+
+cd roles/temlates/
+
+cd roles/files
+
+vi info.html
+
+<h1> YOU GUYS ARE JUST FAB!!!</h1>
+
+cd ..
+cd handlers/
+
+cp ../tasks/config/main.yml main.yml
+
+edit main.yml
+
+- name: Restart httpd
+  service:
+    name: httpd
+    state: restarted
+
+cd ..
+cd role1/
+cd tasks/
+
+vi main.yml
+---
+# task file for role1
+- import_tasks: install.yml
+- import_tasks: config.yml
+
+execute the role:
+====
+vi web-setup.yml
+
+- hosts: all
+  become: yes
+  roles:
+    - role1
+
+
+
+web-setup.yml -> Role1 -> task directory (main.yml file) -> Install.yml -> Config.yml
+
+
+ansible-galaxy init ecomm
+
+cp web-setup.yml ecomm.yml
+
+vi  ecomm.yml
+
+- hosts: all
+  become: yes
+  roles:
+    - role1
+    - ecomm
+
+
+we can add multiple roles in a single playbook.
+
+Roles is nothing but a set of structured playbook
+
+ansible-playbook web-setup.yml
+
+=====END=====
+
+
+Task: Java role
+
+
+
+====For project====
+
+#docker-configuration.yml
+- name: Update web servers
+  hosts: localhost
+  become: true
+
+  tasks:
+  - name: Create yum repository for docker
+    yum_repository:
+      name: docker-repo
+      description: "Repo for docker"
+      baseurl: "https://download.docker.com/linux/centos/7/x86_64/stable/"
+      enabled: yes
+      gpgcheck: no
+     
+  - name: Install Docker
+    package:
+      name: "docker-ce-18.09.1-3.el7.x86_64"
+      state: present
+
+  - name: "Install pip"
+    package:
+      name: "python3-pip"
+      state: present
+      update_cache: true
+
+  - name: Install Docker sdk
+    pip:
+      name: "docker"
+
+  - name: "Start docker service"
+    service:
+      name: "docker"
+      state: started
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

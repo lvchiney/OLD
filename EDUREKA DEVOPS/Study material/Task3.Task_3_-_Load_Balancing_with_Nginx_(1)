@@ -1,0 +1,43 @@
+Task 3 - Load Balancing with Nginx
+
+Step 1
+- Launch Instance
+  security (SSH, HTTP)
+
+Step 2
+- //Download repositories
+  sudo yum -y install epel-release 
+  sudo yum update
+  sudo yum install nginx
+  //Now if we browse the Ip we should see the Nginx page
+
+Step 3 (If we face an error) - not mandate step
+- //If there is trouble trouble loading the page (on centos)
+  //Lets check if there is a firewall not blocking the page
+  sudo yum -y install firewalld
+  sudo firewall-cmd --state
+  sudo systemctl start firewalld
+
+Step 4
+- //Now lets cofig Nginx as Load Balancer
+  sudo nano /etc/nginx/nginx.conf
+  //Add the below script 
+  http {
+    upstream myapp1 {
+        server 00.00.00.00; (Ip address of 1st application server)
+        server 11.11.11.11; (Ip address of 2nd application server)
+        }
+
+    server {
+        listen 80;
+
+        location / {
+            proxy_pass http://myapp1;
+        }
+    }
+}
+ // Save and exit
+
+Step 5 
+- Sudo systemctl restart httpd
+ //Now if we browse public ip of nginx server we would be able to see the application servers. 

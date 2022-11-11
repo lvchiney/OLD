@@ -1,0 +1,7 @@
+terraform state lists
+terraform state show <any one of the above command>
+tf output -json
+$r = tf output -json | convertfrom-json
+$r
+Write-Output "$($r.'budget-name'.value) is the name!"
+                                                                      
